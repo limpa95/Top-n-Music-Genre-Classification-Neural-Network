@@ -34,7 +34,12 @@ def plot_mel_spectrogram_on_screen(y, sr):
         S_dB, x_axis='time', y_axis='mel', sr=sr, fmax=8000, ax=ax, cmap='viridis')
     # fig.colorbar(img, ax=ax, format='%+2.0f dB')
     ax.set(title='Mel-frequency spectrogram')
-    plt.show()
+
+    # Save the figure to a file
+    plt.savefig('test_output/mel_spectrogram.png',
+                dpi=300, bbox_inches='tight')
+
+    # plt.show()
 
     # for testing, remove later
     plt.close()
@@ -54,22 +59,35 @@ def select_audio_files():
     for genre_fodler in os.listdir(data_folder_path):
         genres.append(genre_fodler)
 
+    genres.sort()
+
     return genres, data_folder_path
 
 
 def calculate_dataset_mel_spectrographs(genres, data_folder_path):
     """"""
+    # get songs in genere folder and add them to a list
     for genre in genres:
+        print(f"Processing {genre}")
         genre_dir = f'{data_folder_path}/{genre}'
+        file_list = []
         for file_name in os.listdir(genre_dir):
             if file_name.endswith('.wav'):
-                file_path = os.path.join(genre_dir, file_name)
-                print(
-                    f"Calculating mel spectrograph for {genre_dir}/{file_name}")
-                y, sr = get_audio_timeseries_array_and_samplerate(file_path)
-                plot_mel_spectrogram_on_screen(y, sr)
+                file_list.append(file_name)
+        file_list.sort()
 
-                # mel_spectrograph = extract_mel_spectrogram(file_path)
+        # go thorugh list of songs and create mel spectroraph
+        for audio_name in file_list:
+            file_path = os.path.join(genre_dir, audio_name)
+            print(
+                f"Calculating mel spectrograph for {genre_dir}/{audio_name}")
+            y, sr = get_audio_timeseries_array_and_samplerate(file_path)
+            plot_mel_spectrogram_on_screen(y, sr)
+
+            # mel_spectrograph = extract_mel_spectrogram(file_path)
+
+        input("Are you ready for the next genre?")
+        break
 
 
 if __name__ == '__main__':
@@ -81,12 +99,16 @@ if __name__ == '__main__':
     #     # plot_timeseries_waveform(y, sr)
     #     plot_mel_spectrogram_on_screen(y, sr)
 
+    # path = "GTZAN_Dataset/Data/genres_original/blues/"
+    # files_and_dirs = os.listdir(path)
+    # print(files_and_dirs)
+
     genres, data_folder_path = select_audio_files()
     calculate_dataset_mel_spectrographs(genres, data_folder_path)
 
 
 # windows
-# TZAN_Dataset\Data\genres_original\blues\blues.00000.wav
+# GTZAN_Dataset\Data\genres_original\blues\blues.00000.wav
 # linux
 # GTZAN_Dataset/Data/genres_original/blues/blues.00000.wav
 
