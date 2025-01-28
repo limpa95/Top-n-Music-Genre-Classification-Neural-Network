@@ -1,16 +1,10 @@
-# IDE
 .vscode
 .idea/
 
 # folders
 GTZAN_Dataset
 mel_spectrogram*
-mel_spec*
 test_output
-single_input
-single_output
-__pycache__
 
 # files
 test.py
-
