@@ -1,11 +1,3 @@
-# IDE
 .vscode
 
 
-# folders
-GTZAN_Dataset
-mel_spectrogram*
-test_output
-
-# files
-test.py
