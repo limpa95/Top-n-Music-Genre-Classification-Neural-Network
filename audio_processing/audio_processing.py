@@ -2,8 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import os
+import multiprocessing
+import time
 
-# some of the code is from librosa documentaiton examples
+# some of the code is derived from librosa documentaiton examples
+
+# tell librosa to use specific backend. Helps with multicore
+os.environ['AUDIORAD_BACKEND'] = 'ffmpeg'
 
 
 def get_audio_timeseries_array_and_samplerate(audio_path):
@@ -25,33 +30,35 @@ def plot_timeseries_waveform(y, sr):
     plt.show()
 
 
-def plot_mel_spectrogram_on_screen(y, sr):
+def convert_audio_to_mel_spectrogram(y, sr, show_plot=False, show_axis=False):
     """"""
     S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
     fig, ax = plt.subplots()
     S_dB = librosa.power_to_db(S, ref=np.max)
-    img = librosa.display.specshow(
-        S_dB, x_axis='time', y_axis='mel', sr=sr, fmax=8000, ax=ax, cmap='viridis')
-    # fig.colorbar(img, ax=ax, format='%+2.0f dB')
-    ax.set(title='Mel-frequency spectrogram')
+    if show_axis is True:
+        img = librosa.display.specshow(
+            S_dB, x_axis='time', y_axis='mel', sr=sr, fmax=8000, ax=ax)  # cmap='viridis'
+        fig.colorbar(img, ax=ax, format='%+2.0f dB')
+        ax.set(title='Mel-frequency spectrogram')
+    else:
+        img = librosa.display.specshow(
+            S_dB, sr=sr, fmax=8000, ax=ax)
 
-    # Save the figure to a file
-    plt.savefig('test_output/mel_spectrogram.png',
-                dpi=300, bbox_inches='tight')
+    if show_plot is True:
+        plt.show()
 
-    # plt.show()
-
-    # for testing, remove later
-    plt.close()
+    return fig
 
 
-def select_audio_files():
-
-    print("Please enter the path to a data directory with the song files for that genre.")
-    print("The folder structure should be a folder with subfolders named after each genre.")
-    print("Inside each genre folder should be the audio files of that genre.")
+def input_file_path(prompt=False):
+    """"""
+    if prompt is True:
+        print(
+            "Please enter the path to a data directory with the song files for that genre.")
+        print("The folder structure should be a folder with subfolders named after each genre.")
+        print("Inside each genre folder should be the audio files of that genre.")
     data_folder_path = input("Path: ")
-    print(f"You entered: {data_folder_path}")
+    # print(f"You entered: {data_folder_path}")
 
     # genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
     genres = []
@@ -64,52 +71,81 @@ def select_audio_files():
     return genres, data_folder_path
 
 
-def calculate_dataset_mel_spectrographs(genres, data_folder_path):
+def get_audio_files(genres, data_folder_path):
     """"""
-    # get songs in genere folder and add them to a list
+    all_files = []
+    # Get all audio files in all genres
     for genre in genres:
-        print(f"Processing {genre}")
+        print(f"Getting {genre}")
         genre_dir = f'{data_folder_path}/{genre}'
-        file_list = []
         for file_name in os.listdir(genre_dir):
             if file_name.endswith('.wav'):
-                file_list.append(file_name)
-        file_list.sort()
+                all_files.append((genre, genre_dir, file_name))
 
-        # go thorugh list of songs and create mel spectroraph
-        for audio_name in file_list:
-            file_path = os.path.join(genre_dir, audio_name)
-            print(
-                f"Calculating mel spectrograph for {genre_dir}/{audio_name}")
-            y, sr = get_audio_timeseries_array_and_samplerate(file_path)
-            plot_mel_spectrogram_on_screen(y, sr)
+    return all_files
 
-            # mel_spectrograph = extract_mel_spectrogram(file_path)
 
-        input("Are you ready for the next genre?")
-        break
+def process_audio_file(all_files, conversion, parallell=False):
+    """"""
+    start = time.time()
+    if parallell is False:
+        for file in all_files:
+            conversion(file)
+
+    else:
+        # Use multiprocessing to process the audio files in parallel
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+            pool.map(conversion, all_files)
+
+    end = time.time()
+
+    print(f"Time: {(end - start)} seconds")
+
+
+# Function to process each audio file
+# The way the args are passed to this funciton were influenced by copilot output
+def convert_dataset_mel_spectrogram(args):
+    genre, genre_dir, audio_name = args
+    file_path = os.path.join(genre_dir, audio_name)
+    print(f"Calculating mel spectrogram for {file_path}")
+    y, sr = get_audio_timeseries_array_and_samplerate(file_path)
+    fig = convert_audio_to_mel_spectrogram(y, sr)
+    save_mel_spectrogram(fig, genre, audio_name)
+
+
+def save_mel_spectrogram(fig, genre, audio_name):
+    """"""
+    # some of this funciton was generated with Copilot
+    folder_path = f'mel_spectrogram/{genre}'
+
+    # Create the directory if it does not exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    # strip .wav from audio name
+    stripped_name = audio_name.replace(".wav", "")
+
+    # Full path for the file
+    file_path = os.path.join(folder_path, f'{stripped_name}.png')
+
+    # Save the figure to a file
+    fig.savefig(file_path, dpi=300, bbox_inches='tight')
+
+    plt.close()
 
 
 if __name__ == '__main__':
 
-    # while True:
+    genres, data_folder_path = input_file_path()
+    all_files = get_audio_files(genres, data_folder_path)
+    process_audio_file(
+        all_files, convert_dataset_mel_spectrogram, parallell=False)
 
-    #     y, sr = enter_single_file()
 
-    #     # plot_timeseries_waveform(y, sr)
-    #     plot_mel_spectrogram_on_screen(y, sr)
-
-    # path = "GTZAN_Dataset/Data/genres_original/blues/"
-    # files_and_dirs = os.listdir(path)
-    # print(files_and_dirs)
-
-    genres, data_folder_path = select_audio_files()
-    calculate_dataset_mel_spectrographs(genres, data_folder_path)
-
+# file path examples
 
 # windows
-# GTZAN_Dataset\Data\genres_original\blues\blues.00000.wav
-# linux
-# GTZAN_Dataset/Data/genres_original/blues/blues.00000.wav
+# GTZAN_Dataset\Data\genres_original
 
+# linux
 # GTZAN_Dataset/Data/genres_original
