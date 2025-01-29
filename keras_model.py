@@ -67,3 +67,4 @@ model.fit(x=X_train,
           epochs=30,
           shuffle=True,
           verbose=2)
+
