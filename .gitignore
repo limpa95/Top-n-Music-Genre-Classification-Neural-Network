@@ -6,6 +6,8 @@
 GTZAN_Dataset
 mel_spectrogram*
 test_output
+single_input
+single_output
 
 # files
 test.py

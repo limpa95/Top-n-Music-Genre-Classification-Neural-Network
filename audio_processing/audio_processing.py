@@ -50,7 +50,7 @@ def convert_audio_to_mel_spectrogram(y, sr, show_plot=False, show_axis=False):
     return fig
 
 
-def input_file_path(prompt=False):
+def training_input_file_path(prompt=True):
     """"""
     if prompt is True:
         print(
@@ -71,6 +71,20 @@ def input_file_path(prompt=False):
     return genres, data_folder_path
 
 
+def convert_single_file_mel_spectrogam(file):
+    """"""
+    file_path = os.path.join("single_input", file)
+    print(f"Calculating mel spectrogram for {file}")
+    y, sr = get_audio_timeseries_array_and_samplerate(file_path)
+    fig = convert_audio_to_mel_spectrogram(y, sr)
+    save_mel_spectrogram_png(fig, file)
+
+
+def validate_single_file(file_path):
+    """"""
+    return file_path
+
+
 def get_audio_files(genres, data_folder_path):
     """"""
     all_files = []
@@ -85,7 +99,12 @@ def get_audio_files(genres, data_folder_path):
     return all_files
 
 
-def process_audio_file(all_files, conversion, parallell=False):
+def process_single_audio_file(file, conversion):
+    """"""
+    conversion(file)
+
+
+def process_audio_files(all_files, conversion, parallell=False):
     """"""
     start = time.time()
     if parallell is False:
@@ -110,23 +129,34 @@ def convert_dataset_mel_spectrogram(args):
     print(f"Calculating mel spectrogram for {file_path}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
     fig = convert_audio_to_mel_spectrogram(y, sr)
-    save_mel_spectrogram(fig, genre, audio_name)
+    save_mel_spectrogram_png(fig, audio_name, genre)
 
 
-def save_mel_spectrogram(fig, genre, audio_name):
+def save_mel_spectrogram_png(fig, audio_name, genre=""):
     """"""
-    # some of this funciton was generated with Copilot
-    folder_path = f'mel_spectrogram/{genre}'
-
-    # Create the directory if it does not exist
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
 
     # strip .wav from audio name
     stripped_name = audio_name.replace(".wav", "")
 
-    # Full path for the file
-    file_path = os.path.join(folder_path, f'{stripped_name}.png')
+    if genre != "":
+        # some of this funciton was generated with Copilot
+        genre_path = f'mel_spec_training_png_out/{genre}'
+
+        # Create the directory if it does not exist
+        if not os.path.exists(genre_path):
+            os.makedirs(genre_path)
+
+        # Full path for the file
+        file_path = os.path.join(genre_path, f'{stripped_name}.png')
+
+    else:
+        single_file_output_directory = "single_output"
+
+        if not os.path.exists(single_file_output_directory):
+            os.makedirs(single_file_output_directory)
+
+        file_path = os.path.join(
+            single_file_output_directory, f"{stripped_name}.png")
 
     # Save the figure to a file
     fig.savefig(file_path, dpi=300, bbox_inches='tight')
@@ -134,18 +164,72 @@ def save_mel_spectrogram(fig, genre, audio_name):
     plt.close()
 
 
+class EmptyDirectoryError(Exception):
+    """Custom exception for empty directories."""
+    pass
+
+
+def check_single_input_directory(EmptyDirectoryError, data_folder_path):
+    try:
+        # get list of files in directory
+        files_in_directory = os.listdir(data_folder_path)
+
+        # check if directry is empty
+        if not files_in_directory:
+            raise EmptyDirectoryError(
+                f"The directory {data_folder_path} is empty.")
+
+        print(f"Found {files_in_directory}")
+        return files_in_directory
+
+    except FileNotFoundError:
+        print(f"The directory '{data_folder_path}' does not exist.")
+        print(f"Making directory: {data_folder_path}")
+        os.mkdir(data_folder_path)
+        return
+
+    except EmptyDirectoryError as empty:
+        print(empty)
+        return
+
+
 if __name__ == '__main__':
 
-    genres, data_folder_path = input_file_path()
-    all_files = get_audio_files(genres, data_folder_path)
-    process_audio_file(
-        all_files, convert_dataset_mel_spectrogram, parallell=False)
+    # genres, data_folder_path = input_file_path()
+    # all_files = get_audio_files(genres, data_folder_path)
+    # process_audio_file(
+    #     all_files, convert_dataset_mel_spectrogram, parallell=False)
+
+    # file_path = input("")
+    # is_valid = validate_single_file(file_path)
+    # file = file_path
+    # print(file)
+    # process_single_audio_file(
+    #     file, convert_single_file_mel_spectrogam)
+
+    data_folder_path = "single_input"
+
+    while (1):
+
+        files_list = check_single_input_directory(
+            EmptyDirectoryError, data_folder_path)
+
+        if files_list:
+            for audio_file in files_list:
+                process_single_audio_file(
+                    audio_file, convert_single_file_mel_spectrogam)
+        # os.system('clear')
+        print("Waiting for file.")
+        time.sleep(5)
 
 
-# file path examples
+# -----------------------------------------------------------------
+# file path examples for converting lots of files at once.
 
 # windows
 # GTZAN_Dataset\Data\genres_original
 
 # linux
+# GTZAN_Dataset/Data/genres_original/blues/blues.00090.wav
 # GTZAN_Dataset/Data/genres_original
+# =GTZAN_Dataset/Data/genres_original/blues/blues.00091.wav
