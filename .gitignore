@@ -1,6 +1,6 @@
 # IDE
 .vscode
-
+.idea/
 
 # folders
 GTZAN_Dataset
@@ -13,3 +13,4 @@ __pycache__
 
 # files
 test.py
+
