@@ -1,11 +1,13 @@
 import audio_processing as ap
+import os
 import time
+import sys
 
 
 """
-This is the main file for converting audio files to input into the AI Model.
+This is the main file for converting audio files to input into the AI Model. 
 Run this file and place audio to be converted into the single_input directory
-Audio will be converted and placed in the single_output directory.
+Audio will be converted and placed in the single_output directory. 
 """
 
 
@@ -34,7 +36,8 @@ while (run):
         else:
             if printed_waiting is False:
                 # os.system('clear')
-                print(f"Waiting for file input to {data_folder_path} dir")
+                print(f"Waiting for file input to {
+                      data_folder_path} directory")
                 print("To exit the program press 'ctrl+c'")
                 printed_waiting = True
             time.sleep(5)
