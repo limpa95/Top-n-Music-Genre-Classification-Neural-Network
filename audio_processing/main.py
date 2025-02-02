@@ -3,9 +3,9 @@ import time
 
 
 """
-This is the main file for converting audio files to input into the AI Model. 
+This is the main file for converting audio files to input into the AI Model.
 Run this file and place audio to be converted into the single_input directory
-Audio will be converted and placed in the single_output directory. 
+Audio will be converted and placed in the single_output directory.
 """
 
 
