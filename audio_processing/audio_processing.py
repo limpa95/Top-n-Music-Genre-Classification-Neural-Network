@@ -32,33 +32,75 @@ def get_audio_timeseries_array_and_samplerate(audio_path):
     return y, sr
 
 
-def break_audio_into_sections(y, sr, length):
+def break_audio_into_sections(y, sr, length=5):
     """
-    Breaks the audio samples up into discrete sections based on length passed in.
+    Breaks the audio samples up into discrete sections based on length
+    passed in.
     """
-    pass
+    samples = len(y)
+    length_seconds = len(y)/sr
+    audio_chunks = []
+    print(f"Sample rate: {sr}")
+    print(f"Number of samples: {samples}")
+    print(f"Audio length (s): {length_seconds}")
 
-def get_middle_of_audio(y, sr, length):
+    if length_seconds < 5 or length < 5:
+        print("Audio must be at least 5 seconds long")
+        audio_chunks.append(y)
+        return y, sr
+
+    elif length_seconds > length:
+
+        # make it a integer to cut off the last few seconds of the audio that
+        # wont be full length
+        number_of_chunks = int((samples / sr) / length)
+        print(f"Number of chunks: {number_of_chunks}")
+        samples_per_chunk = length * sr
+        print(f"Samples per chunk: {samples_per_chunk}")
+
+        for chunk in range(number_of_chunks):
+            if chunk == 0:
+                start = 0
+            end = samples_per_chunk * (chunk + 1)
+            print(f"Start: {start}")
+            print(f"End: {end}")
+            audio_chunks.append(y[start:end - 1])
+            start = end
+
+        audio_chunks.append(y)
+
+        return audio_chunks, sr
+
+    else:
+        print("Requested audio length is longer then audio.")
+        audio_chunks.append(y)
+        return y, sr
+
+
+def get_middle_of_audio(y, sr, length=30):
     """
     Gets a middle portion of the audio samples based on the length passed in.
     """
     samples = len(y)
     length_seconds = len(y)/sr
-    print(f"Sample rate = {sr}")
-    print(f"Number of samples = {samples}")
-    print(f"Audio length (s) = {length_seconds}")
+    audio_chunks = []
+    print(f"Sample rate: {sr}")
+    print(f"Number of samples: {samples}")
+    print(f"Audio length (s): {length_seconds}")
 
     if length_seconds > length:
         # print(length_seconds - length)
         samples_to_trim = round((length_seconds - 30) * sr)
-        print(f"Number of samples to trim: = {samples_to_trim}")
+        print(f"Number of samples to trim: {samples_to_trim}")
         print(f"Trimming {round(samples_to_trim/2)} samples from both ends")
         trimed_y = y[int(samples_to_trim/2):-int(samples_to_trim/2)]
 
+        audio_chunks.append(trimed_y)
         return trimed_y, sr
 
     else:
         print("Requested audio length is longer then audio.")
+        audio_chunks.append(y)
         return y, sr
 
 
@@ -131,13 +173,23 @@ def convert_single_file_mel_spectrogam(file):
     """Converts a single file to a mel spectrogram and saves it as a
     png and npy file.
     """
+    start = time.time()
     file_path = os.path.join("single_input", file)
     print(f"Calculating mel spectrogram for {file}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
-    y, sr = get_middle_of_audio(y, sr, 30)
-    fig, S_dB = convert_audio_to_mel_spectrogram(y, sr)
-    save_mel_spectrogram_png(fig, file)
-    save_mel_spectrogram_npy(S_dB, file)
+    # audio_chunks, sr = get_middle_of_audio(y, sr, 30)
+    audio_chunks, sr = break_audio_into_sections(y, sr, 5)
+
+    # process each audio chunk of an audio file.
+    for chunk in range(len(audio_chunks)):
+        fig, S_dB = convert_audio_to_mel_spectrogram(audio_chunks[chunk], sr)
+        partial_file_name = file + f"_part{chunk}"
+        save_mel_spectrogram_png(fig, partial_file_name)
+        save_mel_spectrogram_npy(S_dB, partial_file_name)
+
+    end = time.time()
+
+    print(f"Time to convert audio file: {(end - start)} seconds")
 
 
 # def validate_single_file(file_path):
@@ -190,14 +242,24 @@ def convert_dataset_mel_spectrogram(args):
     Converts multiple files in genre folders into mel spectrograms and saves
     them as png and npy files
     """
+    start = time.time()
+
     genre, genre_dir, audio_name = args
     file_path = os.path.join(genre_dir, audio_name)
     print(f"Calculating mel spectrogram for {file_path}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
-    y, sr = get_middle_of_audio(y, sr, 30)
-    fig, S_dB = convert_audio_to_mel_spectrogram(y, sr)
-    save_mel_spectrogram_png(fig, audio_name, genre)
-    save_mel_spectrogram_npy(S_dB, audio_name, genre)
+    # audio_chunks, sr = get_middle_of_audio(y, sr, 30)
+    audio_chunks, sr = break_audio_into_sections(y, sr, 5)
+
+    # process each audio chunk of an audio file.
+    for chunk in range(len(audio_chunks)):
+        fig, S_dB = convert_audio_to_mel_spectrogram(audio_chunks[chunk], sr)
+        partial_audio_name = audio_name + f"_part{chunk}"
+        save_mel_spectrogram_png(fig, partial_audio_name, genre)
+        save_mel_spectrogram_npy(S_dB, partial_audio_name, genre)
+
+    end = time.time()
+    print(f"Time to convert audio file: {(end - start)} seconds")
 
 
 def save_mel_spectrogram_png(fig, audio_name, genre=""):

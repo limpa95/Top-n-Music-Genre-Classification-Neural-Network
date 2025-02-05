@@ -11,6 +11,7 @@ single_input
 single_output
 __pycache__
 downloaded_audio
+test_song_dl
 
 # files
 test.py
