@@ -32,6 +32,36 @@ def get_audio_timeseries_array_and_samplerate(audio_path):
     return y, sr
 
 
+def break_audio_into_sections(y, sr, length):
+    """
+    Breaks the audio samples up into discrete sections based on length passed in.
+    """
+    pass
+
+def get_middle_of_audio(y, sr, length):
+    """
+    Gets a middle portion of the audio samples based on the length passed in.
+    """
+    samples = len(y)
+    length_seconds = len(y)/sr
+    print(f"Sample rate = {sr}")
+    print(f"Number of samples = {samples}")
+    print(f"Audio length (s) = {length_seconds}")
+
+    if length_seconds > length:
+        # print(length_seconds - length)
+        samples_to_trim = round((length_seconds - 30) * sr)
+        print(f"Number of samples to trim: = {samples_to_trim}")
+        print(f"Trimming {round(samples_to_trim/2)} samples from both ends")
+        trimed_y = y[int(samples_to_trim/2):-int(samples_to_trim/2)]
+
+        return trimed_y, sr
+
+    else:
+        print("Requested audio length is longer then audio.")
+        return y, sr
+
+
 def plot_timeseries_waveform(y, sr):
     """
     Displays the itme series waveform of an audio file using the amplitude
@@ -104,6 +134,7 @@ def convert_single_file_mel_spectrogam(file):
     file_path = os.path.join("single_input", file)
     print(f"Calculating mel spectrogram for {file}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
+    y, sr = get_middle_of_audio(y, sr, 30)
     fig, S_dB = convert_audio_to_mel_spectrogram(y, sr)
     save_mel_spectrogram_png(fig, file)
     save_mel_spectrogram_npy(S_dB, file)
@@ -163,6 +194,7 @@ def convert_dataset_mel_spectrogram(args):
     file_path = os.path.join(genre_dir, audio_name)
     print(f"Calculating mel spectrogram for {file_path}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
+    y, sr = get_middle_of_audio(y, sr, 30)
     fig, S_dB = convert_audio_to_mel_spectrogram(y, sr)
     save_mel_spectrogram_png(fig, audio_name, genre)
     save_mel_spectrogram_npy(S_dB, audio_name, genre)
