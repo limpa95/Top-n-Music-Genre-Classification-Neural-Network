@@ -10,7 +10,7 @@ def banner():
     """Uses ASCII text to display a banner. Prints banner to console."""
 
     text = """                        Top-n
-              Music Genre 
+              Music Genre
           Classification
     Neural Network"""
     f = Figlet(font="Ogre")
