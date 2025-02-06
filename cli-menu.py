@@ -24,6 +24,7 @@ def banner():
 # Call banner function outside while loop to display title of program only once.
 banner()
 
+
 def menu():
     """Uses while loop to run CLI menu. Provides instructions to the user and displays top-n graph."""
 
