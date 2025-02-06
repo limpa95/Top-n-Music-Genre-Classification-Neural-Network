@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def display_accuracy():
+def display_accuracy(file_name):
     """Loads AI model and formats user submitted spectrogram to produce prediction results.
     Then uses matplotlib to display accuracy metrics in Top-n format."""
 
@@ -22,7 +22,7 @@ def display_accuracy():
 
     # Grab img path, convert, and normalize spectrogram.
 
-    img_path = os.path.join(parent_dir, 'single_output', 'png', f'blues.00000_part4.png')
+    img_path = os.path.join(parent_dir, 'single_output', 'png', f'{file_name}.png')
     img = Image.open(img_path).convert('RGB').resize(img_size)
     np_array = np.array(img) / 255.0
     np_array = (np.expand_dims(np_array, 0))

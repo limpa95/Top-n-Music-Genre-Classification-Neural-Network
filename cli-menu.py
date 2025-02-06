@@ -35,11 +35,13 @@ while True:
     if choice == "1":
         print("\nPlace your song into the 'single_input' folder. The format needs to be .wav.\n")
 
+        file_name = input("Next, please enter the name of your file: ")
+
         current_dir = os.path.dirname(__file__)
         spectrogram_path = os.path.join(current_dir, 'single_output', 'png')
 
         if os.listdir(spectrogram_path):
-            display_accuracy()
+            display_accuracy(file_name)
         else:
             print("\nNo file found. Try again\n")
     elif choice == "2":
