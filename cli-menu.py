@@ -24,27 +24,35 @@ def banner():
 # Call banner function outside while loop to display title of program only once.
 banner()
 
-while True:
-    print("1: Song classification instructions")
-    print("2: Exit")
+def menu():
+    """Uses while loop to run CLI menu. Provides instructions to the user and displays top-n graph."""
 
-    choice = input("Please enter your choice: ")
+    while True:
+        print("1: Song classification instructions")
+        print("2: Exit")
 
-    choice = choice.strip()
+        choice = input("Please enter your choice: ")
 
-    if choice == "1":
-        print("\nPlace your song into the 'single_input' folder. The format needs to be .wav.\n")
+        choice = choice.strip()
 
-        file_name = input("Next, please enter the name of your file: ")
+        if choice == "1":
+            print("\nPlace your song into the 'single_input' folder. The format needs to be .wav.\n")
 
-        current_dir = os.path.dirname(__file__)
-        spectrogram_path = os.path.join(current_dir, 'single_output', 'png')
+            file_name = input("Next, please enter the name of your file: ")
 
-        if os.listdir(spectrogram_path):
-            display_accuracy(file_name)
+            current_dir = os.path.dirname(__file__)
+            spectrogram_path = os.path.join(current_dir, 'single_output', 'png')
+
+            if os.listdir(spectrogram_path):
+                display_accuracy(file_name)
+            else:
+                print("\nNo file found. Try again\n")
+        elif choice == "2":
+            break
         else:
-            print("\nNo file found. Try again\n")
-    elif choice == "2":
-        break
-    else:
-        print("Error: Not a valid choice. Please retry.")
+            print("Error: Not a valid choice. Please retry.")
+
+
+if __name__ == '__main__':
+    menu()
+    
