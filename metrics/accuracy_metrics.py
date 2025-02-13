@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def display_accuracy(file_name):
+def display_accuracy(files_list):
     """Loads AI model and formats user submitted spectrogram to produce prediction results.
     Then uses matplotlib to display accuracy metrics in Top-n format."""
 
@@ -16,35 +16,36 @@ def display_accuracy(file_name):
     current_dir = os.path.dirname(__file__)
     parent_dir = os.path.dirname(current_dir)
 
-    model_path = os.path.join(parent_dir, 'model', 'genre_classification_cnn.h5')
+    model_path = os.path.join(parent_dir, 'model', 'genre_classification_cnn_jun.h5')
 
     new_model = tf.keras.models.load_model(model_path)
 
     # Grab img path, convert, and normalize spectrogram.
 
-    img_path = os.path.join(parent_dir, 'single_output', 'png', f'{file_name}.png')
-    img = Image.open(img_path).convert('RGB').resize(img_size)
-    np_array = np.array(img) / 255.0
-    np_array = (np.expand_dims(np_array, 0))
+    for file in files_list:
+        img_path = os.path.join(parent_dir, 'audio_processing', 'single_output', 'png', file)
+        img = Image.open(img_path).convert('RGB').resize(img_size)
+        np_array = np.array(img) / 255.0
+        np_array = (np.expand_dims(np_array, 0))
 
-    # Make prediction.
-    prediction = new_model.predict(np_array)
-    prediction_list = prediction[0]
+        # Make prediction.
+        prediction = new_model.predict(np_array)
+        prediction_list = prediction[0]
 
-    # Pair probabilities with genre labels.
-    tuples_list = list(zip(genres, prediction_list))
-    sorted_tuples_list = sorted(tuples_list, key=lambda x: x[1])
+        # Pair probabilities with genre labels.
+        tuples_list = list(zip(genres, prediction_list))
+        sorted_tuples_list = sorted(tuples_list, key=lambda x: x[1])
 
-    # Display accuracy metrics in top-n format.
-    y = [x[0] for x in sorted_tuples_list]
-    w = [x[1] * 100 for x in sorted_tuples_list]
-    c = ["blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue"]
+        # Display accuracy metrics in top-n format.
+        y = [x[0] for x in sorted_tuples_list]
+        w = [x[1] * 100 for x in sorted_tuples_list]
+        c = ["blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue"]
 
-    plt.barh(y, w, 0.5, color=c)
-    plt.xlabel("Accuracy (%)")
-    plt.ylabel("Genre")
-    plt.title("Music Genre Classification")
-    plt.show()
+        plt.barh(y, w, 0.5, color=c)
+        plt.xlabel("Accuracy (%)")
+        plt.ylabel("Genre")
+        plt.title("Music Genre Classification")
+        plt.show()
 
 
 if __name__ == '__main__':

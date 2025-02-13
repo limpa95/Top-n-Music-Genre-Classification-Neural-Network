@@ -2,6 +2,7 @@ from pyfiglet import Figlet
 from termcolor import colored
 from colorama import init as colorama_init
 import os
+import keyboard
 from metrics.accuracy_metrics import display_accuracy
 
 # Initialize colorama to allow colored terminal text in Windows OS.
@@ -37,17 +38,35 @@ def menu():
         choice = choice.strip()
 
         if choice == "1":
-            print("\nPlace your song into the 'single_input' folder. The format needs to be .wav.\n")
-
-            file_name = input("Next, please enter the name of your file: ")
+            print("\nPlace your song into the 'single_input' folder under 'audio_processing.' "
+                  "The format needs to be .wav.\nPress enter to continue.")
 
             current_dir = os.path.dirname(__file__)
-            spectrogram_path = os.path.join(current_dir, 'single_output', 'png')
+            png_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'png')
+            npy_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'npy')
 
-            if os.listdir(spectrogram_path):
-                display_accuracy(file_name)
+            keyboard.wait('enter')
+
+            if os.listdir(png_spectrogram_path):
+                png_files_list = os.listdir(png_spectrogram_path)
+
+                # Call metrics function to display accuracy.
+                display_accuracy(png_files_list)
+
+                # Remove png files from directory to prep for new file.
+                for file in png_files_list:
+                    os.remove(os.path.join(png_spectrogram_path, file))
+
+            if os.listdir(npy_spectrogram_path):
+                npy_files_list = os.listdir(npy_spectrogram_path)
+
+                # Remove npy files from directory to prep for new file.
+                for file in npy_files_list:
+                    os.remove(os.path.join(npy_spectrogram_path, file))
+
             else:
-                print("\nNo file found. Try again\n")
+                print("No files found. Try again\n")
+
         elif choice == "2":
             break
         else:
