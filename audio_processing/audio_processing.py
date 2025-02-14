@@ -7,8 +7,10 @@ import time
 
 
 """
-This file is the main file used for converting audio into formates usefull for training the AI model.
-It is also used in main for converting single files into formats that will be input into the completed AI model for genre classificaiton. 
+This file is the main file used for converting audio into formates usefull for
+training the AI model.
+It is also used in main for converting single files into formats that will be
+input into the completed AI model for genre classificaiton.
 """
 
 
@@ -19,7 +21,10 @@ os.environ['AUDIORAD_BACKEND'] = 'ffmpeg'
 
 
 def get_audio_timeseries_array_and_samplerate(audio_path):
-    """Gets the waveform amplitude and the saple rate its sampled at by librosa"""
+    """
+    Gets the waveform amplitude and the saple rate its sampled at by
+    librosa
+    """
 
     # y is a numpy array of the waveform amplitude
     # sr is the sample rate which defaults to 22050Hz
@@ -28,7 +33,10 @@ def get_audio_timeseries_array_and_samplerate(audio_path):
 
 
 def plot_timeseries_waveform(y, sr):
-    """Displays the itme series waveform of an audio file using the amplitude and sample rate"""
+    """
+    Displays the itme series waveform of an audio file using the amplitude
+    and sample rate
+    """
     plt.figure(figsize=(14, 5))
     librosa.display.waveshow(y, sr=sr)
     plt.title('Waveform of the Audio File')
@@ -38,13 +46,16 @@ def plot_timeseries_waveform(y, sr):
 
 
 def convert_audio_to_mel_spectrogram(y, sr, show_plot=False, show_axis=False):
-    """Takes the audio file y and sr to convert it to a mel spectrogram shifted to dB"""
+    """
+    Takes the audio file y and sr to convert it to a mel spectrogram
+    shifted to dB
+    """
     S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
     fig, ax = plt.subplots()
     S_dB = librosa.power_to_db(S, ref=np.max)
     if show_axis is True:
         img = librosa.display.specshow(
-            S_dB, x_axis='time', y_axis='mel', sr=sr, fmax=8000, ax=ax)  # cmap='viridis'
+            S_dB, x_axis='time', y_axis='mel', sr=sr, fmax=8000, ax=ax)
         fig.colorbar(img, ax=ax, format='%+2.0f dB')
         ax.set(title='Mel-frequency spectrogram')
     else:
@@ -58,17 +69,24 @@ def convert_audio_to_mel_spectrogram(y, sr, show_plot=False, show_axis=False):
 
 
 def training_input_file_path(prompt=True):
-    """Used for collect multiple files in genre folders for the purpose of generating training data"""
+    """
+    Used for collect multiple files in genre folders for the purpose of
+    generating training data
+    """
     if prompt is True:
         print(
-            "Please enter the path to a data directory with the song files for that genre.")
-        print("The folder structure should be the data folder with subfolders named after each genre.")
-        print("Inside each genre folder should be the audio files of that genre you would like converted.")
+            "Please enter the path to a data directory with the song files \
+                for that genre.")
+        print("The folder structure should be the data folder with subfolders \
+              named after each genre.")
+        print("Inside each genre folder should be the audio files of that \
+              genre you would like converted.")
         print("Example: 'GTZAN_Dataset/Data/genres_original'")
     data_folder_path = input("Path: ")
     # print(f"You entered: {data_folder_path}")
 
-    # genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+    # genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', \
+    # 'metal', 'pop', 'reggae', 'rock']
     genres = []
 
     for genre_fodler in os.listdir(data_folder_path):
@@ -80,7 +98,9 @@ def training_input_file_path(prompt=True):
 
 
 def convert_single_file_mel_spectrogam(file):
-    """Converts a single file to a mel spectrogram and saves it as a png and npy file. """
+    """Converts a single file to a mel spectrogram and saves it as a
+    png and npy file.
+    """
     file_path = os.path.join("single_input", file)
     print(f"Calculating mel spectrogram for {file}")
     y, sr = get_audio_timeseries_array_and_samplerate(file_path)
@@ -122,7 +142,8 @@ def process_audio_files(all_files, conversion, parallell=False):
 
     else:
         # Use multiprocessing to process the audio files in parallel
-        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as \
+                pool:
             pool.map(conversion, all_files)
 
     end = time.time()
@@ -131,9 +152,13 @@ def process_audio_files(all_files, conversion, parallell=False):
 
 
 # Function to process each audio file
-# The way the args are passed to this funciton were influenced by copilot output
+# The way the args are passed to this funciton were
+# influenced by copilot output
 def convert_dataset_mel_spectrogram(args):
-    """Converts multiple files in genre folders into mel spectrograms and saves them as png and npy files"""
+    """
+    Converts multiple files in genre folders into mel spectrograms and saves
+    them as png and npy files
+    """
     genre, genre_dir, audio_name = args
     file_path = os.path.join(genre_dir, audio_name)
     print(f"Calculating mel spectrogram for {file_path}")
@@ -212,7 +237,10 @@ class EmptyDirectoryError(Exception):
 
 
 def check_single_input_directory(EmptyDirectoryError, data_folder_path):
-    """Checks for and gets the file names if there are any in the directory passed in"""
+    """
+    Checks for and gets the file names if there are any in the directory
+    passed in
+    """
     try:
         # get list of files in directory
         files_in_directory = os.listdir(data_folder_path)
@@ -231,7 +259,7 @@ def check_single_input_directory(EmptyDirectoryError, data_folder_path):
         os.mkdir(data_folder_path)
         return
 
-    except EmptyDirectoryError as empty:
+    except EmptyDirectoryError:
         # print(empty)
         return
 
