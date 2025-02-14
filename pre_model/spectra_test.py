@@ -19,7 +19,6 @@ import librosa.display
 import numpy as np
 import os
 
-
 # Define the path to the audio data
 data_path = '/Users/junseo/Desktop/OSU/9th term/CS467 Capstone Project/project/Data/genres_original'
 output_path = '/Users/junseo/Desktop/OSU/9th term/CS467 Capstone Project/project/Data/spectrograms'
