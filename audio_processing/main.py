@@ -42,4 +42,3 @@ while (run):
     except KeyboardInterrupt:
         print("Exiting the program.")
         run = False
-        
