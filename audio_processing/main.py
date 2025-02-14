@@ -36,8 +36,7 @@ while (run):
         else:
             if printed_waiting is False:
                 # os.system('clear')
-                print(f"Waiting for file input to {
-                      data_folder_path} directory")
+                print(f"Waiting for file input to {data_folder_path} directory")
                 print("To exit the program press 'ctrl+c'")
                 printed_waiting = True
             time.sleep(5)
