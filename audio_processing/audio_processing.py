@@ -62,8 +62,8 @@ def break_audio_into_sections(y, sr, length=5):
             if chunk == 0:
                 start = 0
             end = samples_per_chunk * (chunk + 1)
-            print(f"Start: {start}")
-            print(f"End: {end}")
+            print(f"Chunk {chunk} Start: {start}")
+            print(f"Chunk {chunk} End: {end}")
             audio_chunks.append(y[start:end - 1])
             start = end
 
