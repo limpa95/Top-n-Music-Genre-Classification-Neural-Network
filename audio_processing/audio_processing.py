@@ -141,7 +141,7 @@ def convert_audio_to_mel_spectrogram(y, sr, show_plot=False, show_axis=False):
 def convert_audio_to_multi_spectrogram(y, sr):
     """
     This function utilizes code from the pre_model/spectra_test.py file to 
-    keep the same data shape for the AI model. 
+    keep the same data shape for the AI model.
     """
     D = librosa.stft(y)
     # use librosa.decompose.hpss to create 3 different spectrograms
