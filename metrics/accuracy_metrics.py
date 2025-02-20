@@ -39,7 +39,6 @@ def display_accuracy(files_list):
     prediction_np_averages = np.mean(prediction_avg_list, axis=0)
     prediction_averages = prediction_np_averages.tolist()
 
-
     # Pair probabilities with genre labels.
     tuples_list = list(zip(genres, prediction_averages))
     sorted_tuples_list = sorted(tuples_list, key=lambda x: x[1])

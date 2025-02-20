@@ -21,12 +21,30 @@ def banner():
     print(colored_text)
 
 
-# Call banner function outside while loop to display title of program only once.
-banner()
+def check_files(path):
+    """Checks if files exist and calls display_accuracy function to show top-n graph.
+    Returns false to indicate folder directory is not empty. Otherwise returns true.
+    """
+
+    if len(os.listdir(path)) > 0:
+        files_list = os.listdir(path)
+
+        # Call metrics function to display accuracy.
+        display_accuracy(files_list)
+
+        # Remove png files from directory to prep for new file.
+        for file in files_list:
+            os.remove(os.path.join(path, file))
+
+        return False
+    return True
 
 
 def menu():
     """Uses while loop to run CLI menu. Provides instructions to the user and displays top-n graph."""
+
+    # Call banner function outside while loop to display title of program only once.
+    banner()
 
     while True:
         print("1: Song classification")
@@ -52,27 +70,12 @@ def menu():
             input("Once the files have finished converting, press enter to continue.\n")
 
             if os.path.exists(png_spectrogram_path):
-                if len(os.listdir(png_spectrogram_path)) > 0:
-                    png_files_list = os.listdir(png_spectrogram_path)
-
-                    # Call metrics function to display accuracy.
-                    display_accuracy(png_files_list)
-
-                    # Remove png files from directory to prep for new file.
-                    for file in png_files_list:
-                        os.remove(os.path.join(png_spectrogram_path, file))
-                    empty = False
+                empty = check_files(png_spectrogram_path)
 
             if os.path.exists(npy_spectrogram_path):
-                if len(os.listdir(npy_spectrogram_path)) > 0:
-                    npy_files_list = os.listdir(npy_spectrogram_path)
+                empty = check_files(png_spectrogram_path)
 
-                    # Remove npy files from directory to prep for new file.
-                    for file in npy_files_list:
-                        os.remove(os.path.join(npy_spectrogram_path, file))
-
-            if os.path.exists(png_spectrogram_path) and empty is True \
-                    or os.path.exists(npy_spectrogram_path) and empty is True:
+            if empty is True:
                 print("No files found. Try again\n")
 
         elif choice == "2":
