@@ -12,6 +12,7 @@ const Uploader= () => {
 
     const [file, setFile] = useState(null);
     const [status, setStatus] = useState("idle")
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     function handleFileChange(e){
         if (e.target.files) {
@@ -23,6 +24,7 @@ const Uploader= () => {
         if (!file) return;
 
         setStatus('uploading');
+        setUploadProgress(0);
 
         const formData = new FormData();
         formData.append('file', file);
@@ -31,13 +33,21 @@ const Uploader= () => {
             await axios.post('https://httpbin.org/post', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                },
+                onUploadProgress: (progressEvent) => {
+                    const progress = progressEvent.total
+                    ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                    : 0;
+                    setUploadProgress(progress);
                 }
             });
 
-            setStatus('success')
+            setStatus('success');
+            setUploadProgress(100);
         }
         catch{
-            setStatus('error')
+            setStatus('error');
+            setUploadProgress(0);
         };
     }
 
@@ -51,6 +61,12 @@ const Uploader= () => {
           <p>Size: {(file.size / 1024).toFixed(2)} KB</p>
           <p>Type: {file.type}</p>
         </div>
+        )}
+
+        {status === 'uploading' && (
+            <div>
+            <p>{uploadProgress}% uploaded</p>
+            </div>
         )}
 
         {file && status !== 'uploading' && (
