@@ -22,6 +22,8 @@ def display_accuracy(files_list):
 
     # Grab img path, convert, and normalize spectrogram.
 
+    prediction_avg_list = []
+
     for file in files_list:
         img_path = os.path.join(parent_dir, 'audio_processing', 'single_output', 'png', file)
         img = Image.open(img_path).convert('RGB').resize(img_size)
@@ -32,20 +34,26 @@ def display_accuracy(files_list):
         prediction = new_model.predict(np_array)
         prediction_list = prediction[0]
 
-        # Pair probabilities with genre labels.
-        tuples_list = list(zip(genres, prediction_list))
-        sorted_tuples_list = sorted(tuples_list, key=lambda x: x[1])
+        prediction_avg_list.append(prediction_list)
 
-        # Display accuracy metrics in top-n format.
-        y = [x[0] for x in sorted_tuples_list]
-        w = [x[1] * 100 for x in sorted_tuples_list]
-        c = ["blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue"]
+    prediction_np_averages = np.mean(prediction_avg_list, axis=0)
+    prediction_averages = prediction_np_averages.tolist()
 
-        plt.barh(y, w, 0.5, color=c)
-        plt.xlabel("Accuracy (%)")
-        plt.ylabel("Genre")
-        plt.title("Music Genre Classification")
-        plt.show()
+
+    # Pair probabilities with genre labels.
+    tuples_list = list(zip(genres, prediction_averages))
+    sorted_tuples_list = sorted(tuples_list, key=lambda x: x[1])
+
+    # Display accuracy metrics in top-n format.
+    y = [x[0] for x in sorted_tuples_list]
+    w = [x[1] * 100 for x in sorted_tuples_list]
+    c = ["blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue", "blue"]
+
+    plt.barh(y, w, 0.5, color=c)
+    plt.xlabel("Accuracy (%)")
+    plt.ylabel("Genre")
+    plt.title("Music Genre Classification")
+    plt.show()
 
 
 if __name__ == '__main__':

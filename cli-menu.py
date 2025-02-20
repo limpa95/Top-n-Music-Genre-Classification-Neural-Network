@@ -2,7 +2,6 @@ from pyfiglet import Figlet
 from termcolor import colored
 from colorama import init as colorama_init
 import os
-import keyboard
 from metrics.accuracy_metrics import display_accuracy
 
 # Initialize colorama to allow colored terminal text in Windows OS.
@@ -30,7 +29,7 @@ def menu():
     """Uses while loop to run CLI menu. Provides instructions to the user and displays top-n graph."""
 
     while True:
-        print("1: Song classification instructions")
+        print("1: Song classification")
         print("2: Exit")
 
         choice = input("Please enter your choice: ")
@@ -38,16 +37,21 @@ def menu():
         choice = choice.strip()
 
         if choice == "1":
+
+            # Keep track of file deletion and error message
+            empty = True
+
             print("\nPlace your song into the 'single_input' folder under 'audio_processing.' "
-                  "The format needs to be .wav.\nPress enter to continue.")
+                  "The format needs to be .wav.\n")
 
             current_dir = os.path.dirname(__file__)
             png_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'png')
             npy_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'npy')
 
-            keyboard.wait('enter')
+            # Pause program to wait for user to place music file and continue after pressing enter.
+            input("Please press enter to continue.\n")
 
-            if os.listdir(png_spectrogram_path):
+            if len(os.listdir(png_spectrogram_path)) > 0:
                 png_files_list = os.listdir(png_spectrogram_path)
 
                 # Call metrics function to display accuracy.
@@ -56,21 +60,23 @@ def menu():
                 # Remove png files from directory to prep for new file.
                 for file in png_files_list:
                     os.remove(os.path.join(png_spectrogram_path, file))
+                empty = False
 
-            if os.listdir(npy_spectrogram_path):
+            if len(os.listdir(npy_spectrogram_path)) > 0:
                 npy_files_list = os.listdir(npy_spectrogram_path)
 
                 # Remove npy files from directory to prep for new file.
                 for file in npy_files_list:
                     os.remove(os.path.join(npy_spectrogram_path, file))
 
-            else:
+            if len(os.listdir(png_spectrogram_path)) == 0 and empty is True \
+                    or len(os.listdir(npy_spectrogram_path)) == 0 and empty is True:
                 print("No files found. Try again\n")
 
         elif choice == "2":
             break
         else:
-            print("Error: Not a valid choice. Please retry.")
+            print("Error: Not a valid choice. Please retry.\n")
 
 
 if __name__ == '__main__':
