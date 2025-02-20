@@ -16,7 +16,7 @@ def display_accuracy(files_list):
     current_dir = os.path.dirname(__file__)
     parent_dir = os.path.dirname(current_dir)
 
-    model_path = os.path.join(parent_dir, 'model', 'genre_classification_cnn_jun.h5')
+    model_path = os.path.join(parent_dir, 'pre_model', 'genre_classification_model.h5')
 
     new_model = tf.keras.models.load_model(model_path)
 

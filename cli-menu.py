@@ -49,28 +49,30 @@ def menu():
             npy_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'npy')
 
             # Pause program to wait for user to place music file and continue after pressing enter.
-            input("Please press enter to continue.\n")
+            input("Once the files have finished converting, press enter to continue.\n")
 
-            if len(os.listdir(png_spectrogram_path)) > 0:
-                png_files_list = os.listdir(png_spectrogram_path)
+            if os.path.exists(png_spectrogram_path):
+                if len(os.listdir(png_spectrogram_path)) > 0:
+                    png_files_list = os.listdir(png_spectrogram_path)
 
-                # Call metrics function to display accuracy.
-                display_accuracy(png_files_list)
+                    # Call metrics function to display accuracy.
+                    display_accuracy(png_files_list)
 
-                # Remove png files from directory to prep for new file.
-                for file in png_files_list:
-                    os.remove(os.path.join(png_spectrogram_path, file))
-                empty = False
+                    # Remove png files from directory to prep for new file.
+                    for file in png_files_list:
+                        os.remove(os.path.join(png_spectrogram_path, file))
+                    empty = False
 
-            if len(os.listdir(npy_spectrogram_path)) > 0:
-                npy_files_list = os.listdir(npy_spectrogram_path)
+            if os.path.exists(npy_spectrogram_path):
+                if len(os.listdir(npy_spectrogram_path)) > 0:
+                    npy_files_list = os.listdir(npy_spectrogram_path)
 
-                # Remove npy files from directory to prep for new file.
-                for file in npy_files_list:
-                    os.remove(os.path.join(npy_spectrogram_path, file))
+                    # Remove npy files from directory to prep for new file.
+                    for file in npy_files_list:
+                        os.remove(os.path.join(npy_spectrogram_path, file))
 
-            if len(os.listdir(png_spectrogram_path)) == 0 and empty is True \
-                    or len(os.listdir(npy_spectrogram_path)) == 0 and empty is True:
+            if os.path.exists(png_spectrogram_path) and empty is True \
+                    or os.path.exists(npy_spectrogram_path) and empty is True:
                 print("No files found. Try again\n")
 
         elif choice == "2":
