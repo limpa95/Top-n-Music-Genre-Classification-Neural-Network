@@ -1,0 +1,64 @@
+[
+    {
+        "name": "Die With A Smile",
+        "artists": [
+            "Lady Gaga",
+            "Bruno Mars"
+        ]
+    },
+    {
+        "name": "BIRDS OF A FEATHER",
+        "artists": [
+            "Billie Eilish"
+        ]
+    },
+    {
+        "name": "Sailor Song",
+        "artists": [
+            "Gigi Perez"
+        ]
+    },
+    {
+        "name": "Good Luck, Babe!",
+        "artists": [
+            "Chappell Roan"
+        ]
+    },
+    {
+        "name": "WILDFLOWER",
+        "artists": [
+            "Billie Eilish"
+        ]
+    },
+    {
+        "name": "Timeless (feat. Playboi Carti)",
+        "artists": [
+            "The Weeknd",
+            "Playboi Carti"
+        ]
+    },
+    {
+        "name": "No One Noticed",
+        "artists": [
+            "The Mar\u00edas"
+        ]
+    },
+    {
+        "name": "Taste",
+        "artists": [
+            "Sabrina Carpenter"
+        ]
+    },
+    {
+        "name": "Snooze",
+        "artists": [
+            "SZA"
+        ]
+    },
+    {
+        "name": "Sweater Weather",
+        "artists": [
+            "The Neighbourhood"
+        ]
+    }
+]
