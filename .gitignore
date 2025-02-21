@@ -13,13 +13,18 @@
 GTZAN_Dataset
 mel_spectrogram*
 mel_spec*
+processed_audio*
 test_output
 single_input
 single_output
 __pycache__
+downloaded_audio
+test_song_dl
+
 
 # files
 test.py
+audio_getter.py
 
 # Logs
 logs

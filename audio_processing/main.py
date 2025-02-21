@@ -23,8 +23,10 @@ while (run):
         if files_list:
             files_list.sort()
             for audio_file in files_list:
+                # ap.process_single_audio_file(
+                #     audio_file, ap.convert_single_file_mel_spectrogram)
                 ap.process_single_audio_file(
-                    audio_file, ap.convert_single_file_mel_spectrogam)
+                    audio_file, ap.convert_single_file_multi_spectrogram)
 
                 print("File converted")
 
@@ -37,7 +39,7 @@ while (run):
                 print(f"Waiting for file input to {data_folder_path} dir")
                 print("To exit the program press 'ctrl+c'")
                 printed_waiting = True
-            time.sleep(5)
+            time.sleep(0.5)
 
     except KeyboardInterrupt:
         print("Exiting the program.")
