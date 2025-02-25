@@ -21,15 +21,33 @@ def banner():
     print(colored_text)
 
 
-# Call banner function outside while loop to display title of program only once.
-banner()
+def check_files(path):
+    """Checks if files exist and calls display_accuracy function to show top-n graph.
+    Returns false to indicate folder directory is not empty. Otherwise returns true.
+    """
+
+    if len(os.listdir(path)) > 0:
+        files_list = os.listdir(path)
+
+        # Call metrics function to display accuracy.
+        display_accuracy(files_list)
+
+        # Remove png files from directory to prep for new file.
+        for file in files_list:
+            os.remove(os.path.join(path, file))
+
+        return False
+    return True
 
 
 def menu():
     """Uses while loop to run CLI menu. Provides instructions to the user and displays top-n graph."""
 
+    # Call banner function outside while loop to display title of program only once.
+    banner()
+
     while True:
-        print("1: Song classification instructions")
+        print("1: Song classification")
         print("2: Exit")
 
         choice = input("Please enter your choice: ")
@@ -37,21 +55,33 @@ def menu():
         choice = choice.strip()
 
         if choice == "1":
-            print("\nPlace your song into the 'single_input' folder. The format needs to be .wav.\n")
 
-            file_name = input("Next, please enter the name of your file: ")
+            # Keep track of file deletion and error message
+            empty = True
+
+            print("\nPlace your song into the 'single_input' folder under 'audio_processing.' "
+                  "The format needs to be .wav.\n")
 
             current_dir = os.path.dirname(__file__)
-            spectrogram_path = os.path.join(current_dir, 'single_output', 'png')
+            png_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'png')
+            npy_spectrogram_path = os.path.join(current_dir, 'audio_processing', 'single_output', 'npy')
 
-            if os.listdir(spectrogram_path):
-                display_accuracy(file_name)
-            else:
-                print("\nNo file found. Try again\n")
+            # Pause program to wait for user to place music file and continue after pressing enter.
+            input("Once the files have finished converting, press enter to continue.\n")
+
+            if os.path.exists(png_spectrogram_path):
+                empty = check_files(png_spectrogram_path)
+
+            if os.path.exists(npy_spectrogram_path):
+                empty = check_files(png_spectrogram_path)
+
+            if empty is True:
+                print("No files found. Try again\n")
+
         elif choice == "2":
             break
         else:
-            print("Error: Not a valid choice. Please retry.")
+            print("Error: Not a valid choice. Please retry.\n")
 
 
 if __name__ == '__main__':
