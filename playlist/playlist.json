@@ -1,64 +1,73 @@
 [
     {
-        "name": "Die With A Smile",
+        "name": "Experience",
         "artists": [
-            "Lady Gaga",
-            "Bruno Mars"
+            "Ludovico Einaudi",
+            "Daniel Hope",
+            "I Virtuosi Italiani"
         ]
     },
     {
-        "name": "BIRDS OF A FEATHER",
+        "name": "Cello Suite No. 1 in G Major, BWV 1007: I. Pr\u00e9lude",
         "artists": [
-            "Billie Eilish"
+            "Johann Sebastian Bach",
+            "Yo-Yo Ma"
         ]
     },
     {
-        "name": "Good Luck, Babe!",
+        "name": "Adieux",
         "artists": [
-            "Chappell Roan"
+            "Ludovico Einaudi"
         ]
     },
     {
-        "name": "Sailor Song",
+        "name": "Carnival of the Animals: The Swan",
         "artists": [
-            "Gigi Perez"
+            "Camille Saint-Sa\u00ebns",
+            "Isata Kanneh-Mason",
+            "Jeneba Kanneh-Mason",
+            "Sheku Kanneh-Mason"
         ]
     },
     {
-        "name": "WILDFLOWER",
+        "name": "Gymnop\u00e9die No. 1",
         "artists": [
-            "Billie Eilish"
+            "Erik Satie",
+            "Philippe Entremont"
         ]
     },
     {
-        "name": "No One Noticed",
+        "name": "Suite bergamasque, L. 75: III. Clair de lune",
         "artists": [
-            "The Mar\u00edas"
+            "Claude Debussy",
+            "Alice Sara Ott"
         ]
     },
     {
-        "name": "Timeless (feat. Playboi Carti)",
+        "name": "Sonata No. 14 \"Moonlight\" in C-Sharp Minor\", Op. 27 No. 2: I. Adagio sostenuto",
         "artists": [
-            "The Weeknd",
-            "Playboi Carti"
+            "Ludwig van Beethoven",
+            "Paul Lewis"
         ]
     },
     {
-        "name": "Taste",
+        "name": "Tchaikovsky: Swan Lake, Op. 20, Act 2: No. 10, Scene. Moderato",
         "artists": [
-            "Sabrina Carpenter"
+            "Pyotr Ilyich Tchaikovsky",
+            "Andr\u00e9 Previn",
+            "London Symphony Orchestra"
         ]
     },
     {
-        "name": "Snooze",
+        "name": "River Flows In You",
         "artists": [
-            "SZA"
+            "Yiruma"
         ]
     },
     {
-        "name": "Pink Pony Club",
+        "name": "Merry-Go-Round of Life - from 'Howl's Moving Castle'",
         "artists": [
-            "Chappell Roan"
+            "Joe Hisaishi"
         ]
     }
 ]
