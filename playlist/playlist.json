@@ -13,15 +13,15 @@
         ]
     },
     {
-        "name": "Sailor Song",
-        "artists": [
-            "Gigi Perez"
-        ]
-    },
-    {
         "name": "Good Luck, Babe!",
         "artists": [
             "Chappell Roan"
+        ]
+    },
+    {
+        "name": "Sailor Song",
+        "artists": [
+            "Gigi Perez"
         ]
     },
     {
@@ -31,16 +31,16 @@
         ]
     },
     {
+        "name": "No One Noticed",
+        "artists": [
+            "The Mar\u00edas"
+        ]
+    },
+    {
         "name": "Timeless (feat. Playboi Carti)",
         "artists": [
             "The Weeknd",
             "Playboi Carti"
-        ]
-    },
-    {
-        "name": "No One Noticed",
-        "artists": [
-            "The Mar\u00edas"
         ]
     },
     {
@@ -56,9 +56,9 @@
         ]
     },
     {
-        "name": "Sweater Weather",
+        "name": "Pink Pony Club",
         "artists": [
-            "The Neighbourhood"
+            "Chappell Roan"
         ]
     }
 ]

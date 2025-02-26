@@ -1,16 +1,30 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify
 import os
 import json
 import time
-import spotipy  # type: ignore
-from spotipy.oauth2 import SpotifyClientCredentials  # type: ignore
+import threading
+from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
-CLIENT_ID = '53ce03981b224f6390e23c33329b67aa'
-CLIENT_SECRET = 'cd9881b784e74c94abbec986d0438b06'
+# Load environment variables from .env file
+load_dotenv()
+
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 redirect_uri = 'http://127.0.0.1:5000'  # Redirect URI for Spotify API
+
+observer = None  # Initialize observer as None
+
+# Define the paths for the JSON files
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PREDICTION_FILE = os.path.join(BASE_DIR, 'prediction.json')
+PLAYLIST_FILE = os.path.join(BASE_DIR, 'playlist.json')
 
 
 def get_tracks_by_genre(genre, limit=10):
@@ -33,6 +47,9 @@ def read_genre_from_json(file_path):
     except FileNotFoundError:
         print(f"File {file_path} not found. Continuing to search...")
         return None
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from file {file_path}.")
+        return None
 
 
 def save_tracks_to_json(tracks, file_path):
@@ -47,74 +64,81 @@ def save_tracks_to_json(tracks, file_path):
                 ]
             }
             filtered_tracks.append(track_info)
-    with open(file_path, 'w') as file:
-        json.dump(filtered_tracks, file, indent=4)
-
-
-def update_prediction_json(file_path, genre):
-    '''updates the prediction.json file with the new playlist'''
     try:
-        with open(file_path, 'r+') as file:
-            data = json.load(file)
-            data['genre'] = genre
-            file.seek(0)  # Reset file pointer to the beginning
-            json.dump(data, file, indent=4)
-            file.truncate()  # Truncate the file to remove any leftover data
-    except FileNotFoundError:
-        print(f"File {file_path} not found. Creating a new file...")
         with open(file_path, 'w') as file:
-            json.dump({'genre': genre}, file, indent=4)
+            json.dump(filtered_tracks, file, indent=4)
+        print(f"Tracks successfully saved to {file_path}")
+    except IOError as e:
+        print(f"Error writing to file {file_path}: {e}")
+
+
+class PredictionFileHandler(FileSystemEventHandler):
+    def __init__(self, input_file, output_file):
+        self.input_file = input_file
+        self.output_file = output_file
+
+    def on_modified(self, event):
+        if event.src_path == self.input_file:
+            print(f"Detected modification in {self.input_file}")
+            genre = read_genre_from_json(self.input_file)
+            if genre:
+                print(f"Genre found: {genre}")
+                try:
+                    tracks = get_tracks_by_genre(genre)
+                    save_tracks_to_json(tracks, self.output_file)
+                    print(f"Tracks saved to {self.output_file}")
+                except Exception as e:
+                    print(f"Error fetching tracks from Spotify: {e}")
+            else:
+                print("No genre found in the prediction file.")
+
+
+def start_observer():
+    global observer  # Use the global observer
+
+    event_handler = PredictionFileHandler(PREDICTION_FILE, PLAYLIST_FILE)
+    observer = Observer()
+
+    observer.schedule(event_handler, path=BASE_DIR, recursive=False)
+    observer.start()
+    print("Observer started")
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+
+
+def reset_observer():
+    global observer  # Use the global observer
+    if observer:
+        observer.stop()
+        observer.join()
+    start_observer()
 
 
 @app.route('/')
 def main():
-    input_file = 'prediction.json'
-    output_file = 'playlist.json'
-    last_modified_time = None
-
-    while True:
-        # search for 'prediction.json' file to read the genre
-        genre = read_genre_from_json(input_file)
-        if not genre:
-            print("No genre found in the input file. Continuing to search...")
-            continue
-
-        tracks = get_tracks_by_genre(genre)
-        print(f'Top {len(tracks)} tracks in the {genre} genre:')
-        for track in tracks:
-            if track:  # Check if track is not None
-                name = track.get('name')
-                artist = track.get('artists', [{}])[0].get('name')
-                if name and artist:
-                    print(f"{name} by {artist}")
-        # Save the playlist(track) to a playlist.json file
-        save_tracks_to_json(tracks, output_file)
-        print(f"Tracks saved to {output_file}")
-
-        # Check if the playlist.json file has been updated
-        current_modified_time = os.path.getmtime(output_file)
-        if (last_modified_time is None or
-                current_modified_time > last_modified_time):
-            last_modified_time = current_modified_time
-            update_prediction_json(input_file, genre)
-            print(f"Prediction file updated with new genre: {genre}")
-
-        # Wait for a specified amount of time before continuing the loop
-        time.sleep(60)  # Wait for 60 seconds
-
-    return render_template('index.html')
+    return "Welcome to the Music Genre Classification App"
 
 
 @app.route('/playlist')
 def get_playlist():
-    output_file = 'playlist.json'
     try:
-        with open(output_file, 'r') as file:
+        with open(PLAYLIST_FILE, 'r') as file:
             data = json.load(file)
             return jsonify(data)
     except FileNotFoundError:
         return jsonify({"error": "Playlist file not found"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "Error decoding JSON from playlist file"}), \
+               500
 
 
 if __name__ == '__main__':
+    observer_thread = threading.Thread(target=start_observer)
+    observer_thread.daemon = True
+    observer_thread.start()
     app.run(debug=True)  # Run the Flask app
