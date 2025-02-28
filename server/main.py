@@ -7,8 +7,12 @@ import librosa.display
 from flask import Flask, request, send_file, jsonify
 import tensorflow as tf
 from PIL import Image
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+plt.switch_backend('agg')
+
 
 # List of genres (used for labeling the prediction results)
 GENRES = ['blues', 'classical', 'country', 'disco', 'hiphop',
