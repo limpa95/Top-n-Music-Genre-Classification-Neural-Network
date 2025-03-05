@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "contributors": [
-    "Devin Daniels <github.com/devingdaniels>",
-    "Zac Maes <github.com/zacmaes>",
     "Patrick Lim"
   ],
   "dependencies": {

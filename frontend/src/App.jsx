@@ -20,7 +20,7 @@ function App() {
         <h2>Top-n Music Genre Classification</h2>
       </header>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<HomePage />} />
       </Routes>
       <footer>
         <p>&copy; 2025 Amine Kaddour-Djebbar, Clinton Merritt, Jun Seo, Patrick Lim</p>

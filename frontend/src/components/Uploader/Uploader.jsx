@@ -13,7 +13,6 @@ const Uploader= () => {
     const [file, setFile] = useState(null);
     const [status, setStatus] = useState("idle")
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [graph, setGraph] = useState();
     const [imageUrl, setImageUrl] = useState("");
 
     function handleFileChange(e){
@@ -32,7 +31,7 @@ const Uploader= () => {
         formData.append('file', file);
 
         try{
-            const response = await axios.post("http://18.189.143.41:5000/predict", formData, {
+            const response = await axios.post(import.meta.env.VITE_BACKEND_URL, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
