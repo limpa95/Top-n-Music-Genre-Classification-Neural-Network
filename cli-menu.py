@@ -2,6 +2,8 @@ from pyfiglet import Figlet
 from termcolor import colored
 from colorama import init as colorama_init
 import os
+import json
+import requests
 from metrics.accuracy_metrics import display_accuracy
 
 # Initialize colorama to allow colored terminal text in Windows OS.
@@ -30,14 +32,37 @@ def check_files(path):
         files_list = os.listdir(path)
 
         # Call metrics function to display accuracy.
-        display_accuracy(files_list)
+        predicted_genre = display_accuracy(files_list)
 
         # Remove png files from directory to prep for new file.
         for file in files_list:
             os.remove(os.path.join(path, file))
 
-        return False
+        return (False, predicted_genre)
     return True
+
+
+def playlist(name, genre):
+    """"""
+
+    with open(name, 'w') as file:
+        file.truncate(0)
+
+        data = {'genre': genre}
+        json.dump(data, file)
+
+    url = "http://127.0.0.1:5000/playlist"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+
+        data = response.json()
+        for song in data:
+            print(song["name"])
+            print("Artists: "+",".join(song["artists"])+"\n")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to playlist server: {e}")
 
 
 def menu():
@@ -58,6 +83,7 @@ def menu():
 
             # Keep track of file deletion and error message
             empty = True
+            predicted_genre = ""
 
             print("\nPlace your song into the 'single_input' folder under 'audio_processing.' "
                   "The format needs to be .wav.\n")
@@ -70,10 +96,21 @@ def menu():
             input("Once the files have finished converting, press enter to continue.\n")
 
             if os.path.exists(png_spectrogram_path):
-                empty = check_files(png_spectrogram_path)
+                results = check_files(png_spectrogram_path)
+                empty = results[0]
+                predicted_genre = results[1]
 
             if os.path.exists(npy_spectrogram_path):
-                empty = check_files(png_spectrogram_path)
+                results = check_files(png_spectrogram_path)
+                empty = results[0]
+                predicted_genre = results[1]
+
+            if empty is False:
+                playlist_choice = input("Would you like a recommendation playlist based on the genre? Press Y "
+                                        "to get a playlist or press any other key to continue.\n")
+                playlist_choice.strip()
+                if playlist_choice.lower() == "y":
+                    playlist("prediction.json", predicted_genre)
 
             if empty is True:
                 print("No files found. Try again\n")

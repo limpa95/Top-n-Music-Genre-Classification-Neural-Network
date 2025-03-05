@@ -6,13 +6,10 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "npx forever start reactServer.cjs",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "contributors": [
-    "Devin Daniels <github.com/devingdaniels>",
-    "Zac Maes <github.com/zacmaes>",
     "Patrick Lim"
   ],
   "dependencies": {
