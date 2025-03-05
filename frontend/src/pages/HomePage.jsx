@@ -9,13 +9,12 @@ import { Routes, Route } from 'react-router-dom';
 import Uploader from "../components/Uploader/Uploader";
 function HomePage() {
   return(
-    <div>
-
+    <div id="pageContainer">
+      <p>Welcome! You can use this site to submit a music file and get its predicted genre based on our AI model.
+          The file format needs to be .wav.</p>
       <Routes>
       <Route path="/" element={<Uploader />} />
       </Routes>
-
-
     </div>
   )
 }

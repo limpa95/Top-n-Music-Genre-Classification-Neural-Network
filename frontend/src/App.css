@@ -1,5 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+  background-color:#edf4f7;
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+}
+
+footer {
+  font:inherit;
+}
+
+h1 {
+  margin: 0% 0% 4% 0%;
+  padding: 1% 0% 1% 0%;
+}
+
+h2 {
+  margin: 0% 0% 1% 0%;
+  padding: 1% 0% 1% 0%;
+}
+
+header {
+  background-color: rgb(235, 185, 128);
+  margin: 0;
+}
+
 html {
-  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -7,4 +33,41 @@ html {
 
 html li {
   list-style-type: none;
+}
+
+img[src=""] {
+  display: none;
+}
+
+.fileInput {
+  border:1.5px dotted gray;
+  border-radius:1% 1% 1% 1%; 
+  cursor: pointer;
+  font: inherit;
+  margin-top: 3%;
+  padding: 1% 0% 1% 2%;
+}
+
+.logo {
+  height: 6%;
+  width: 6%;
+  margin: 0 0 -5% 0;
+}
+
+.buttonUpload {
+  cursor: pointer;
+  font: inherit;
+  min-height: 7%;
+  min-width: 5%;
+}
+
+#pageContainer {
+  margin-top: 3%;
+  flex-grow: 1;
+}
+
+#wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }

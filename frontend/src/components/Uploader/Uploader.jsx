@@ -13,6 +13,8 @@ const Uploader= () => {
     const [file, setFile] = useState(null);
     const [status, setStatus] = useState("idle")
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [graph, setGraph] = useState();
+    const [imageUrl, setImageUrl] = useState("");
 
     function handleFileChange(e){
         if (e.target.files) {
@@ -30,10 +32,11 @@ const Uploader= () => {
         formData.append('file', file);
 
         try{
-            await axios.post('https://httpbin.org/post', formData, {
+            const response = await axios.post("http://18.189.143.41:5000/predict", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
+                responseType: 'blob',
                 onUploadProgress: (progressEvent) => {
                     const progress = progressEvent.total
                     ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -44,19 +47,33 @@ const Uploader= () => {
 
             setStatus('success');
             setUploadProgress(100);
+
+            console.log(response)
+
+            const blob = new Blob([response.data], { type: 'image/png' }); // Expecting an image (PNG)
+            const imageUrl = URL.createObjectURL(blob);
+            setImageUrl(imageUrl); // Store image URL in state to display it
         }
-        catch{
+        catch (error) {
             setStatus('error');
             setUploadProgress(0);
+
+            if (error.response) {
+                console.error("Error data:", error.response.data)
+                console.error("Error status:", error.response.status)
+            }
         };
     }
 
   return (
     <div>
-        <input type="file" onChange={handleFileChange}/>
+        <input 
+            className="fileInput"
+            type="file" 
+            onChange={handleFileChange}/>
 
         {file && (
-        <div className="mb-4 text-sm">
+        <div>
           <p>File name: {file.name}</p>
           <p>Size: {(file.size / 1024).toFixed(2)} KB</p>
           <p>Type: {file.type}</p>
@@ -70,7 +87,9 @@ const Uploader= () => {
         )}
 
         {file && status !== 'uploading' && (
-        <button onClick={handleFileUpload}>Upload</button>
+        <button 
+            className="buttonUpload"
+            onClick={handleFileUpload}>Upload</button>
         )}
 
         {status === 'success' && (
@@ -80,6 +99,8 @@ const Uploader= () => {
         {status === 'error' && (
         <p>Upload failed. Please try again.</p>
         )}
+
+        <img src={imageUrl} alt="Top-n graph"/>
 
     </div>
   );

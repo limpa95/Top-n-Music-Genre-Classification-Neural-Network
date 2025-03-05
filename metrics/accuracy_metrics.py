@@ -54,6 +54,9 @@ def display_accuracy(files_list):
     plt.title("Music Genre Classification")
     plt.show()
 
+    predicted_genre = sorted_tuples_list[0][0]
+
+    return predicted_genre
 
 if __name__ == '__main__':
     display_accuracy()
