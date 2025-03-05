@@ -58,5 +58,6 @@ def display_accuracy(files_list):
 
     return predicted_genre
 
+
 if __name__ == '__main__':
     display_accuracy()
