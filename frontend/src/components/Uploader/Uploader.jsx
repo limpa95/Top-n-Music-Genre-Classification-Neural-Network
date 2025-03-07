@@ -33,7 +33,7 @@ const Uploader= () => {
         formData.append('file', file);
 
         try{
-            const response = await axios.post("http://127.0.0.1:5000/predict", formData, {
+            const response = await axios.post(import.meta.env.VITE_BACKEND_URL, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -120,8 +120,6 @@ const Uploader= () => {
         {status === 'error' && (
         <p>Upload failed. Please try again.</p>
         )}
-
-        <img src={imageUrl} alt="Top-n graph"/>
 
     </div>
   );

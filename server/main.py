@@ -139,6 +139,7 @@ def create_prediction_chart(prediction_list):
     plt.xlabel("Accuracy (%)")
     plt.ylabel("Genre")
     plt.title("Music Genre Classification")
+    plt.tight_layout()
 
     buf = io.BytesIO()
     fig.savefig(buf, format='png')
