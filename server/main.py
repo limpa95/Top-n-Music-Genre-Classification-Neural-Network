@@ -9,7 +9,6 @@ import tensorflow as tf
 from PIL import Image
 from flask_cors import CORS
 
-import json
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -17,9 +16,10 @@ from spotipy.oauth2 import SpotifyClientCredentials
 app = Flask(__name__)
 CORS(app)
 plt.switch_backend('agg')
+load_dotenv()
 
-CLIENT_ID = '53ce03981b224f6390e23c33329b67aa'
-CLIENT_SECRET = 'cd9881b784e74c94abbec986d0438b06'
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 
