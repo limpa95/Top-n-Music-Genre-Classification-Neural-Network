@@ -9,9 +9,18 @@ import tensorflow as tf
 from PIL import Image
 from flask_cors import CORS
 
+import json
+from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 app = Flask(__name__)
 CORS(app)
 plt.switch_backend('agg')
+
+CLIENT_ID = '53ce03981b224f6390e23c33329b67aa'
+CLIENT_SECRET = 'cd9881b784e74c94abbec986d0438b06'
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 
 # List of genres (used for labeling the prediction results)
@@ -24,6 +33,20 @@ MODEL_PATH = os.path.join(
     "../pre_model/genre_classification_model.h5"
 )
 model = tf.keras.models.load_model(MODEL_PATH)
+
+
+def get_tracks_by_genre(genre, limit=10):
+    """Fetch tracks from Spotify based on genre"""
+    try:
+        results = sp.search(q=f'genre:{genre}', type='track', limit=limit)
+        tracks = results['tracks']['items']
+        return [
+            {"name": track["name"], "artists": [artist["name"] for artist in track["artists"]]}
+            for track in tracks
+        ]
+    except Exception as e:
+        print(f"Error fetching tracks from Spotify: {e}")
+        return []
 
 
 # Function to create and save spectrograms for 5-second chunks
@@ -143,9 +166,18 @@ def predict():
         spectrogram_bytes = create_spectrogram(file)
         # Get prediction from the model
         prediction_list = predict_genre_from_spectrogram(spectrogram_bytes)
+        predicted_genre = GENRES[np.argmax(prediction_list)]
+        # Save the predicted genre to prediction.json
+        recommended_tracks = get_tracks_by_genre(predicted_genre)
         # Create a matplotlib chart
         chart_bytes = create_prediction_chart(prediction_list)
-        return send_file(io.BytesIO(chart_bytes), mimetype='image/png')
+        response_data = {
+            "genre": predicted_genre,
+            "chart": io.BytesIO(chart_bytes).read().hex(),
+            "playlist": recommended_tracks
+        }
+        print("Response data:", response_data)
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

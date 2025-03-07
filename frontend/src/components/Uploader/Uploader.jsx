@@ -14,6 +14,8 @@ const Uploader= () => {
     const [status, setStatus] = useState("idle")
     const [uploadProgress, setUploadProgress] = useState(0);
     const [imageUrl, setImageUrl] = useState("");
+    const [genre, setGenre] = useState("");
+    const [playlist, setPlaylist] = useState([]);
 
     function handleFileChange(e){
         if (e.target.files) {
@@ -31,11 +33,11 @@ const Uploader= () => {
         formData.append('file', file);
 
         try{
-            const response = await axios.post(import.meta.env.VITE_BACKEND_URL, formData, {
+            const response = await axios.post("http://127.0.0.1:5000/predict", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                responseType: 'blob',
+                responseType: 'json',
                 onUploadProgress: (progressEvent) => {
                     const progress = progressEvent.total
                     ? Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -49,9 +51,16 @@ const Uploader= () => {
 
             console.log(response)
 
-            const blob = new Blob([response.data], { type: 'image/png' }); // Expecting an image (PNG)
-            const imageUrl = URL.createObjectURL(blob);
-            setImageUrl(imageUrl); // Store image URL in state to display it
+            setGenre(response.data.genre);
+
+            const hexData = response.data.chart; 
+            const binaryString = hexData.match(/.{1,2}/g) 
+                .map(byte => String.fromCharCode(parseInt(byte, 16))) 
+                .join('');
+            const base64Chart = btoa(binaryString); 
+            setImageUrl(`data:image/png;base64,${base64Chart}`);
+
+            setPlaylist(response.data.playlist);
         }
         catch (error) {
             setStatus('error');
@@ -92,7 +101,20 @@ const Uploader= () => {
         )}
 
         {status === 'success' && (
-        <p>File uploaded successfully!</p>
+        <>
+            <p>File uploaded successfully!</p>
+            <h3>Predicted Genre: {genre}</h3>
+            {imageUrl && <img src={imageUrl} alt="Genre Prediction Graph" />}
+
+            <h3>Spotify Recommendations</h3>
+            <ul>
+                {playlist.map((track, index) => (
+                    <li key={index}>
+                        <strong>{track.name}</strong> by {track.artists.join(', ')}
+                    </li>
+                ))}
+            </ul>
+        </>
         )}
 
         {status === 'error' && (
