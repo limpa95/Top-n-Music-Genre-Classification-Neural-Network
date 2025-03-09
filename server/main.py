@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, jsonify
 import tensorflow as tf
 from PIL import Image
 from flask_cors import CORS
