@@ -4,6 +4,7 @@ from colorama import init as colorama_init
 import os
 import json
 import requests
+import time
 from metrics.accuracy_metrics import display_accuracy
 
 # Initialize colorama to allow colored terminal text in Windows OS.
@@ -38,12 +39,13 @@ def check_files(path):
         for file in files_list:
             os.remove(os.path.join(path, file))
 
-        return (False, predicted_genre)
-    return True
+        return False, predicted_genre
+    return True, None
 
 
 def playlist(name, genre):
-    """"""
+    """Writes predicted genre to prediction.json file and pauses for 1 second to wait for playlist to update.
+    Then uses playlist.json to print out a recommendation playlist for users."""
 
     with open(name, 'w') as file:
         file.truncate(0)
@@ -52,6 +54,9 @@ def playlist(name, genre):
         json.dump(data, file)
 
     url = "http://127.0.0.1:5000/playlist"
+
+    time.sleep(1)
+
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -96,21 +101,21 @@ def menu():
             input("Once the files have finished converting, press enter to continue.\n")
 
             if os.path.exists(png_spectrogram_path):
-                results = check_files(png_spectrogram_path)
-                empty = results[0]
-                predicted_genre = results[1]
+                is_empty, results = check_files(png_spectrogram_path)
+                empty = is_empty
+                predicted_genre = results
 
             if os.path.exists(npy_spectrogram_path):
-                results = check_files(png_spectrogram_path)
-                empty = results[0]
-                predicted_genre = results[1]
+                is_empty, results = check_files(png_spectrogram_path)
+                empty = is_empty
+                predicted_genre = results
 
             if empty is False:
                 playlist_choice = input("Would you like a recommendation playlist based on the genre? Press Y "
                                         "to get a playlist or press any other key to continue.\n")
                 playlist_choice.strip()
                 if playlist_choice.lower() == "y":
-                    playlist("prediction.json", predicted_genre)
+                    playlist("playlist/prediction.json", predicted_genre)
 
             if empty is True:
                 print("No files found. Try again\n")

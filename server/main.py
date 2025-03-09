@@ -4,14 +4,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, jsonify
 import tensorflow as tf
 from PIL import Image
 from flask_cors import CORS
 
+from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 app = Flask(__name__)
 CORS(app)
 plt.switch_backend('agg')
+load_dotenv()
+
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
 
 
 # List of genres (used for labeling the prediction results)
@@ -24,6 +33,20 @@ MODEL_PATH = os.path.join(
     "../pre_model/genre_classification_model.h5"
 )
 model = tf.keras.models.load_model(MODEL_PATH)
+
+
+def get_tracks_by_genre(genre, limit=10):
+    """Fetch tracks from Spotify based on genre"""
+    try:
+        results = sp.search(q=f'genre:{genre}', type='track', limit=limit)
+        tracks = results['tracks']['items']
+        return [
+            {"name": track["name"], "artists": [artist["name"] for artist in track["artists"]]}
+            for track in tracks
+        ]
+    except Exception as e:
+        print(f"Error fetching tracks from Spotify: {e}")
+        return []
 
 
 # Function to create and save spectrograms for 5-second chunks
@@ -116,6 +139,7 @@ def create_prediction_chart(prediction_list):
     plt.xlabel("Accuracy (%)")
     plt.ylabel("Genre")
     plt.title("Music Genre Classification")
+    plt.tight_layout()
 
     buf = io.BytesIO()
     fig.savefig(buf, format='png')
@@ -143,9 +167,18 @@ def predict():
         spectrogram_bytes = create_spectrogram(file)
         # Get prediction from the model
         prediction_list = predict_genre_from_spectrogram(spectrogram_bytes)
+        predicted_genre = GENRES[np.argmax(prediction_list)]
+        # Save the predicted genre to prediction.json
+        recommended_tracks = get_tracks_by_genre(predicted_genre)
         # Create a matplotlib chart
         chart_bytes = create_prediction_chart(prediction_list)
-        return send_file(io.BytesIO(chart_bytes), mimetype='image/png')
+        response_data = {
+            "genre": predicted_genre,
+            "chart": io.BytesIO(chart_bytes).read().hex(),
+            "playlist": recommended_tracks
+        }
+        print("Response data:", response_data)
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
