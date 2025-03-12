@@ -8,6 +8,7 @@
 *.njsproj
 *.sln
 *.sw?
+.cache
 
 # folders
 GTZAN_Dataset
@@ -39,4 +40,4 @@ node_modules
 dist-ssr
 *.local
 .env
-
+.vite
