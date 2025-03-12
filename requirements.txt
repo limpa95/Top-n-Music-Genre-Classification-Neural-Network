@@ -1,0 +1,13 @@
+numpy
+tensorflow
+scikit-learn
+matplotlib
+Pillow
+librosa
+Flask
+python-dotenv
+spotipy
+watchdog
+pyfiglet
+termcolor
+colorama
