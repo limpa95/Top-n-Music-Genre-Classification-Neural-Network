@@ -3,7 +3,7 @@
 
 ## Program Link (No installation needed):
 
- Project Showcase: https://projects.engineering.oregonstate.edu/projects/?id=1YZz7K2Y2saqc3sx
+Project Showcase: https://projects.engineering.oregonstate.edu/projects/?id=1YZz7K2Y2saqc3sx
 
 
 ## About The Project
