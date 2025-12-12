@@ -3,7 +3,7 @@
 
 ## Program Link (No installation needed):
 
- Website: http://13.59.74.139:5173/
+ Project Showcase: https://projects.engineering.oregonstate.edu/projects/?id=1YZz7K2Y2saqc3sx
 
 
 ## About The Project
